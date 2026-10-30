@@ -23,6 +23,7 @@ An end-to-end Machine Learning web application designed to predict food delivery
   - [Endpoints](#endpoints)
   - [Sample Request & Response](#sample-request--response)
 - [Installation & Getting Started](#-installation--getting-started)
+- [Deploying to Render](#-deploying-to-render)
 - [Running Standalone Inference](#-running-standalone-inference)
 - [Web Interface](#-web-interface)
 - [Future Enhancements](#-future-enhancements)
@@ -125,6 +126,9 @@ Food_Delivery_Time_Prediction/
 ├── standard_scaler.pkl                  # Serialized scikit-learn StandardScaler
 ├── xgb_best.json                        # Serialized XGBoost model (JSON format)
 ├── xgb_best.pkl                         # Serialized XGBoost model (Joblib pickle)
+├── render.yaml                          # Render Blueprint infrastructure specification
+├── .python-version                      # Pinned Python version (3.11.9) for Render
+├── .gitignore                           # Git ignore rules for virtualenvs and caches
 └── README.md                            # Comprehensive project documentation
 ```
 
@@ -213,6 +217,56 @@ Open your browser and navigate to:
 - **Interactive Web App:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
 - **Interactive Swagger API Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - **ReDoc API Docs:** [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+---
+
+## ☁️ Deploying to Render
+
+This application is fully pre-configured for free cloud hosting on [Render](https://render.com).
+
+### Step 1: Push Code to GitHub
+
+Make sure all changes are committed and pushed to your remote GitHub repository:
+
+```bash
+git add .
+git commit -m "Configure project for Render deployment"
+git push origin main
+```
+
+### Step 2: Deploy on Render
+
+Choose either of the two approaches below:
+
+#### Option A: One-Click Blueprint Deployment (Recommended)
+Because the project includes a `render.yaml` specification, Render can configure everything automatically:
+1. Log in to [dashboard.render.com](https://dashboard.render.com/).
+2. Click **New +** at the top right and select **Blueprint**.
+3. Connect your GitHub account and select your `Food-Delivery-Time-Prediction` repository.
+4. Render will detect `render.yaml` and parse the service settings.
+5. Click **Apply**. Render will automatically provision the build and deploy your service!
+
+#### Option B: Manual Web Service Setup
+1. In your [Render Dashboard](https://dashboard.render.com/), click **New +** > **Web Service**.
+2. Select **Build and deploy from a Git repository** and connect your repository.
+3. Fill in the deployment details:
+   - **Name:** `food-delivery-time-prediction`
+   - **Region:** Pick a region near you (e.g., Oregon, Frankfurt, Singapore)
+   - **Branch:** `main`
+   - **Runtime:** `Python 3`
+   - **Build Command:** `pip install --upgrade pip && pip install -r requirements.txt`
+   - **Start Command:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
+   - **Instance Type:** `Free`
+4. Expand **Advanced**:
+   - Add an Environment Variable:
+     - **Key:** `PYTHON_VERSION`
+     - **Value:** `3.11.9`
+   - Set **Health Check Path:** `/health`
+   - Set **Auto-Deploy:** `Yes`
+5. Click **Create Web Service**.
+
+> [!TIP]
+> **Free Tier Tip:** Render free web services spin down after 15 minutes of inactivity. The first request after a period of dormancy may take 30–50 seconds to initialize ("cold start"). Subsequent requests will be near-instantaneous.
 
 ---
 
